@@ -1,0 +1,11 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-bcrypt
+email_validator
+authlib
+flask-mail
+requests
+psycopg2-binary
+prisma
+python-dotenv

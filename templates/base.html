@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <nav class="glass">
+        <a href="{{ url_for('index') }}" class="logo">FinanceTracker</a>
+        <ul>
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('index') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('budget') }}">Budgets</a></li>
+            <li><a href="#" onclick="document.getElementById('transactionModal').style.display='block'">Add
+                    Transaction</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} glass">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="glass"
+        style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); padding:30px; z-index:100; min-width:350px;">
+        <h2 style="color:white; margin-bottom:20px;">Add Transaction</h2>
+        <form action="{{ url_for('add_transaction') }}" method="POST">
+            <div class="form-group">
+                <label style="color:white;">Type</label>
+                <select name="type" required>
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label style="color:white;">Amount (₹)</label>
+                <input type="number" step="0.01" name="amount" required>
+            </div>
+            <div class="form-group">
+                <label style="color:white;">Category</label>
+                <input type="text" name="category" placeholder="e.g., Food, Salary" required>
+            </div>
+            <div class="form-group">
+                <label style="color:white;">Date</label>
+                <input type="date" name="date">
+            </div>
+            <div class="form-group">
+                <label style="color:white;">Description</label>
+                <input type="text" name="description">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">Add</button>
+            <button type="button" class="btn btn-danger"
+                onclick="document.getElementById('transactionModal').style.display='none'"
+                style="width:100%; margin-top:10px;">Cancel</button>
+        </form>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

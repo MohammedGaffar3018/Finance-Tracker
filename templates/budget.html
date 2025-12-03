@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <div class="card glass">
+        <h3>Set Monthly Budget</h3>
+        <form action="{{ url_for('budget') }}" method="POST">
+            <div class="form-group">
+                <label style="color:white;">Category</label>
+                <input type="text" name="category" placeholder="e.g., Food" required>
+            </div>
+            <div class="form-group">
+                <label style="color:white;">Limit (₹)</label>
+                <input type="number" step="0.01" name="amount" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Set Budget</button>
+        </form>
+    </div>
+
+    <div class="card glass">
+        <h3>Budget Overview</h3>
+        {% if budgets %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Limit</th>
+                    <th>Spent</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for budget in budgets %}
+                {% set spent = spending.get(budget.category, 0) %}
+                {% set percent = (spent / budget.amount) * 100 %}
+                <tr>
+                    <td>{{ budget.category }}</td>
+                    <td>₹{{ "%.2f"|format(budget.amount) }}</td>
+                    <td>₹{{ "%.2f"|format(spent) }}</td>
+                    <td>
+                        <div class="progress-container">
+                            <div class="progress-bar {{ 'bg-danger' if percent > 100 else 'bg-success' }}"
+                                style="width: {{ [percent, 100]|min }}%;"></div>
+                        </div>
+                        <small>{{ "%.0f"|format(percent) }}%</small>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('delete_budget', id=budget.id) }}" class="text-danger"
+                            style="text-decoration: none;">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="opacity: 0.7;">No budgets set.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
